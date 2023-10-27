@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# script that displays the contents of the current directory in list format.
+
+files=$(ls)
+
+for file in $files
+do
+    new=$(echo "$file" | cut -d '-' -f2)
+
+    echo "$new"
+done
