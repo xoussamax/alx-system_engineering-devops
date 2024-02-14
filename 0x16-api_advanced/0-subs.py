@@ -11,7 +11,9 @@ def number_of_subscribers(subreddit):
     user_agent = {'User-agent': 'User-agent'}
 
     response = get(api_url, headers=user_agent, allow_redirects=False)
-    if response.status_code >= 300:
+    if response.status_code == 404:
+        return "Subreddit does not exist"
+    elif response.status_code >= 300:
         return 0
 
     return response.json().get("data").get("subscribers")
