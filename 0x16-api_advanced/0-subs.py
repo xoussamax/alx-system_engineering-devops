@@ -1,16 +1,26 @@
 #!/usr/bin/python3
-"""Function to query subscribers on a given Reddit subreddit."""
-import requests
-
+""" ahaa"""
+from requests import get
+import json
 
 def number_of_subscribers(subreddit):
-    """Return the total number of subscribers on a given subreddit."""
+    # Check if input is a string
+    if not isinstance(subreddit, str):
+        raise TypeError("Subreddit must be a string")
+    
     url = f"https://www.reddit.com/r/{subreddit}/about/.json"
-    headers = {
-        "User-Agent": "linux:0x16.api.advanced:v1.0.0 (by /u/bdov_)"
-    }
-    response = requests.get(url, headers=headers, allow_redirects=False)
-    if response.status_code == 404:
+    headers = {"User-Agent": "my_app"}  # Set a custom user agent to avoid rate limiting issues
+
+    try:
+        response = get(url, headers=headers)
+        
+        if response.status_code != 200:
+            return 0
+            
+        data = json.loads(response.text)
+        subscriber_count = int(data["data"]["subscribers"])
+        return subscriber_count
+
+    except Exception as e:
+        print(f"An error occurred while fetching {subreddit}: {str(e)}")
         return 0
-    results = response.json().get("data")
-    return results.get("subscribers")
