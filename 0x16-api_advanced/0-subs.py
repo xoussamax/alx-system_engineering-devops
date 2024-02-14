@@ -1,18 +1,17 @@
 #!/usr/bin/python3
-"""
-this doc for module
-"""
-import requests
-
-headers = {"User-Agent": "MyCustomUserAgent/1.0"}
+"""number of subscribers for a given subreddit"""
 
 
 def number_of_subscribers(subreddit):
-    """method doc"""
-    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
-    response = requests.get(url, allow_redirects=False, headers=headers)
-    if response.status_code == 200:
-        data = response.json()
-        return data["data"]["subscribers"]
-    else:
+    """Queries Reddit API and returns the
+    number of subscribers for subreddit"""
+    from requests import get
+
+    api_url = f"https://www.reddit.com/r/{subreddit}/about.json"
+    user_agent = {'User-agent': 'User-agent'}
+
+    response = get(api_url, headers=user_agent, allow_redirects=False)
+    if response.status_code >= 300:
         return 0
+
+    return response.json().get("data").get("subscribers")
