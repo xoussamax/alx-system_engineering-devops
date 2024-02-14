@@ -1,19 +1,49 @@
 #!/usr/bin/python3
 """number of subscribers for a given subreddit"""
+from typing import Optional
+import json
+from urllib.parse import quote # For URL encoding
 
+import requests
 
-def number_of_subscribers(subreddit):
-    """Queries Reddit API and returns the
-    number of subscribers for subreddit"""
-    from requests import get
+API_URL = "http://www.reddit.com/"
+USER_AGENT = {"User-agent": "Mozilla/5.0"}
+CONTENT_TYPE = "application/json; charset=utf-8"
 
-    api_url = f"https://www.reddit.com/r/{subreddit}/about.json"
-    user_agent = {'User-agent': 'User-agent'}
+def number_of_subscribers(subreddit: str) -> int:
+    """Returns the number of subscribers for a given subreddit."""
+    try:
+        about_page = _fetch_about_page(subreddit)
+        
+        # Checking for correct content type
+        assert CONTENT_TYPE in about_page.headers['Content-Type']
+    
+        page_content = about_page.text
+            
+            # Parsing JSON data
+            parsed_dict = json.loads(page_content)
+                
+                # Extracting subscriber count
+                num_subscribers = parsed_dict['data']['subscribers']
+                
+                return num_subscribers
+    except Exception:
+        raise ValueError(f"Invalid subreddit '{subreddit}'!")
 
-    response = get(api_url, headers=user_agent, allow_redirects=False)
-    if response.status_code == 404:
-        return "Subreddit does not exist"
-    elif response.status_code >= 300:
-        return 0
-
-    return response.json().get("data").get("subscribers")
+def _fetch_about_page(subreddit: str) -> Optional[requests.Response]:
+    """Fetches the /about.json endpoint for a given subreddit."""
+    encoded_sr = quote(subreddit)  
+    target_endpoint = f"/r/{encoded_sr}/about.json"
+    full_target_path = API_URL + target_endpoint
+    
+    resp = requests.get(full_target_path, headers=USER_AGENT)
+    
+    # Checking for possible redirections
+    if resp.history:
+        last_resp = resp.history[-1]
+        location = last_resp.headers['Location']
+        if '/search?q=' in location:
+            # We were redirected to search results => non-existent subreddit
+            return None
+    
+    return resp
