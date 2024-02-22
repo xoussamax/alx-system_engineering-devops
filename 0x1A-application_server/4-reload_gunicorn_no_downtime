@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
-# Script to reload Gunicorn in a graceful way
-kill -HUP
+# Gracefully restart & update gunicorn workers
+if pkill -HUP gunicorn; then
+        echo "Gunicorn workers were gracefully reloaded."
+else
+        echo "Error: Unable to reload Gunicorn workers." >&2
+        exit 1
+fi
