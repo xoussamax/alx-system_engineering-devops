@@ -1,3 +1,4 @@
-#!/bin/bash
-# Script to reload Gunicorn in a graceful way
+#!/usr/bin/env bash
+# Script to reload Gunicorn configurations and restart workers
+# without killing master processes
 pkill -HUP gunicorn
