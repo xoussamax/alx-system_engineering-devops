@@ -1,3 +1,4 @@
+# Configures Nginx to serve the AirBnB_clone_v3 API.
 server {
     listen 80;
     server_name 54.146.12.127;
